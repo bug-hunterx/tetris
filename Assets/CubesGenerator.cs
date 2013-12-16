@@ -25,7 +25,7 @@ public class CubesGenerator : MonoBehaviour {
 		//set cube size to 1/numberOfColumns of screen
 		cubeSize = Screen.width/columnNumber;
 		print ("Cube size: " + cubeSize);
-		fieldStateManager = new FieldStateManager(columnNumber, (int) (Screen.height/cubeSize), cubeSize);
+        fieldStateManager = new FieldStateManager(columnNumber, (int) (Screen.height/cubeSize), cubeSize);
 		//place generator in middle of top edge
 		transform.position = new Vector3(0, Camera.main.orthographicSize+cubeSize/2, 0);
 

@@ -18,7 +18,7 @@ public class OneElementManager : MonoBehaviour {
 
 	private float delta = 0.01f;
 
-	private float moveDownTime = 1;
+	private float moveDownTime = 0.9f;
 
 	private float screenWidth = Screen.width;
 

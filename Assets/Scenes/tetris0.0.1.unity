@@ -129,6 +129,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43f12e79fe6d89c4c859435fec49f221, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rowsMaxNumber: 0
+  columnsNumber: 0
+  cubeSize: 0
 --- !u!1 &1159052995
 GameObject:
   m_ObjectHideFlags: 0
