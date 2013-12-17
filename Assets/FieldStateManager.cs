@@ -13,6 +13,7 @@ public class FieldStateManager
     private int rowsMaxNumber;
     private int columnsNumber;
     private float cubeSize;
+	ScoreScalable scoreScript;
 
     public FieldStateManager(int columnsNumber, int rowsNumber, float cubeSize)
     {
@@ -25,6 +26,8 @@ public class FieldStateManager
         }
         this.cubeSize = cubeSize;
         Debug.Log("Field manager created: columnsNumber = " + columnsNumber + "; rowsnumber = " + rowsNumber);
+
+		scoreScript = GameObject.FindGameObjectWithTag("Score").GetComponent<ScoreScalable>();
     }
 
     public bool addCube(GameObject cube)
@@ -61,6 +64,7 @@ public class FieldStateManager
         int minColumnIndexWithSameSprite = baseColumnIndex;
         int maxColumnIndexWithSameSprite = baseColumnIndex;
         int minRowIndexWithSameSprite = baseRowIndex;
+		int numberOfCubesDestroyed = 0;
         //look for left cube in sequence of same cubes
         for (int i = baseColumnIndex - 1; i >= 0; i--)
         {
@@ -126,7 +130,7 @@ public class FieldStateManager
                 Debug.Log("Destroy object in row No " + baseRowIndex + " and column No " + i);
                 UObject.Destroy(fieldState[i][baseRowIndex]);
 				fieldState[i].RemoveAt(baseRowIndex);
-               //TODO increse score
+				numberOfCubesDestroyed++;
             }
         }
 
@@ -140,9 +144,12 @@ public class FieldStateManager
                 Debug.Log("Destroy object in row No " + baseRowIndex + " and column No " + i);
                 UObject.Destroy(fieldState[baseColumnIndex][i]);
 				numberOfDeleted++;
+				numberOfCubesDestroyed++;
             }
 			fieldState[baseColumnIndex].RemoveRange(minRowIndexWithSameSprite, numberOfDeleted); 
         }
+
+		scoreScript.updateScore(numberOfCubesDestroyed);
 
 
     }
