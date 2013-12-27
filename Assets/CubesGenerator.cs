@@ -19,9 +19,7 @@ public class CubesGenerator : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		print ("Screen resolution: " + Screen.width + "; " + Screen.height);
-		//TODO why 4?
-		Camera.main.orthographicSize = Screen.height/4;
+
 		//set cube size to 1/numberOfColumns of screen
 		cubeSize = Screen.width/columnNumber;
 		print ("Cube size: " + cubeSize);
@@ -44,6 +42,8 @@ public class CubesGenerator : MonoBehaviour {
 			//generate new if last one has stoped
 			isGenerate = true;
 		}
+		if (Input.GetKeyDown(KeyCode.Escape)) 
+			Application.Quit(); 
 
 	}
 

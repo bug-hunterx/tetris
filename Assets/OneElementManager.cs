@@ -13,8 +13,10 @@ public class OneElementManager : MonoBehaviour {
 	private float size;
 	private float verticalSpeed;
 
-	private int groundMask = 1 << LayerMask.NameToLayer("Ground");
-	private int placedCubeMask = 1 << LayerMask.NameToLayer ("PlacedCubes");
+	public LayerMask obstacles;
+	//private int groundMask = 1 << LayerMask.NameToLayer("Ground");
+	//private int placedCubeMask = 1 << LayerMask.NameToLayer ("PlacedCubes");
+	//private int failingCubeMask = 1 << LayerMask.NameToLayer("FallingCubes");
 
 	private float delta = 0.01f;
 
@@ -58,7 +60,7 @@ public class OneElementManager : MonoBehaviour {
 
 			if(Input.GetKeyDown(KeyCode.DownArrow)){
 				//get coordinates of top edge of object below
-				RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector3.down, Mathf.Infinity, groundMask | placedCubeMask);
+				RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector3.down, Mathf.Infinity, obstacles);
 				Vector3 startPos = transform.position;
 				Vector3 endPos = new Vector3(transform.position.x, hit.point.y + size/4, 0);
 				transform.position = Vector3.Lerp(startPos, endPos, moveDownTime);
@@ -108,8 +110,8 @@ public class OneElementManager : MonoBehaviour {
 		RaycastHit2D hit = Physics2D.Linecast(
 			new Vector3(currentX, currentY - size/4f-delta, z), 
 			new Vector3(currentX, currentY - size/4f -delta, z), 
-			placedCubeMask | groundMask );
-		Debug.Log("Touch smth on down is " + (bool) hit);
+			obstacles );
+		//Debug.Log("Touch smth on down is " + (bool) hit);
 		return hit;
 	}
 
@@ -122,8 +124,8 @@ public class OneElementManager : MonoBehaviour {
 		RaycastHit2D hit = Physics2D.Linecast(
 			new Vector3(currentX - size/4f-delta , currentY - size/4f - delta, z), 
 			new Vector3(currentX - size/2 + delta, currentY, z), 
-			placedCubeMask | groundMask );
-		Debug.Log("Touch smth on left is " + (bool) hit);
+			obstacles );
+		//Debug.Log("Touch smth on left is " + (bool) hit);
 		return hit;
 	}
 
@@ -135,8 +137,8 @@ public class OneElementManager : MonoBehaviour {
 		RaycastHit2D hit = Physics2D.Linecast(
 			new Vector3(currentX + size/4f + delta , currentY - size/4f - delta, z), 
 			new Vector3(currentX + size/2 - delta, currentY, z), 
-			placedCubeMask | groundMask );
-		Debug.Log("Touch smth on right is " + (bool) hit);
+			obstacles );
+		//Debug.Log("Touch smth on right is " + (bool) hit);
 		return hit;
 	}
 

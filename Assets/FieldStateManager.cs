@@ -25,7 +25,7 @@ public class FieldStateManager
             fieldState[i] = new List<GameObject>();
         }
         this.cubeSize = cubeSize;
-        Debug.Log("Field manager created: columnsNumber = " + columnsNumber + "; rowsnumber = " + rowsNumber);
+        //Debug.Log("Field manager created: columnsNumber = " + columnsNumber + "; rowsnumber = " + rowsNumber);
 
 		scoreScript = GameObject.FindGameObjectWithTag("Score").GetComponent<ScoreScalable>();
     }
@@ -34,7 +34,7 @@ public class FieldStateManager
     {
         int columnIndex = (int)((cube.transform.position.x + (float)Screen.width / 4) / (cubeSize / 2f));
         int rowIndex = fieldState[columnIndex].Count;
-        Debug.Log("Cube added into field manager. Column = " + (columnIndex) + ", Row = " + rowIndex);
+        //Debug.Log("Cube added into field manager. Column = " + (columnIndex) + ", Row = " + rowIndex);
         if (rowIndex < rowsMaxNumber)
         {
             fieldState[columnIndex].Add(cube);

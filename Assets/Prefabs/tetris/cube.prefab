@@ -68,6 +68,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uniqueID: 4
+  obstacles:
+    serializedVersion: 2
+    m_Bits: 12288
 --- !u!212 &21200000
 SpriteRenderer:
   m_ObjectHideFlags: 1
