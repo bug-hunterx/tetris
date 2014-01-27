@@ -1,0 +1,11 @@
+F:\workspace\Unity\Tetris\Temp\bin\Debug\Assembly-CSharp-firstpass.dll
+F:\workspace\Unity\Tetris\Temp\bin\Debug\Assembly-CSharp-firstpass.pdb
+F:\workspace\Unity\Tetris\Temp\bin\Debug\UnityEditor.dll
+F:\workspace\Unity\Tetris\Temp\bin\Debug\UnityEngine.dll
+F:\workspace\Unity\Tetris\Temp\bin\Debug\Mono.Cecil.dll
+F:\workspace\Unity\Tetris\Temp\bin\Debug\nunit.framework.dll
+F:\workspace\Unity\Tetris\Temp\bin\Debug\Unity.DataContract.dll
+F:\workspace\Unity\Tetris\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+F:\workspace\Unity\Tetris\obj\Debug\Assembly-CSharp-firstpass-vs.csprojResolveAssemblyReference.cache
+F:\workspace\Unity\Tetris\obj\Debug\Assembly-CSharp-firstpass.dll
+F:\workspace\Unity\Tetris\obj\Debug\Assembly-CSharp-firstpass.pdb
