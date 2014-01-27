@@ -6,40 +6,38 @@ using UObject = UnityEngine.Object;
 public class FieldStateManager
 {
 
-    private List<GameObject>[] fieldState;//one column is arraylist. fieldState.size is number of columns
-
-    //	private int[] numberOfCubesInColumns;
+    private List<GameObject> allCubesOnField;//all cubes. unsorted
 
     private int rowsMaxNumber;
     private int columnsNumber;
     private float cubeSize;
 	ScoreScalable scoreScript;
 
+	private int minNumberInRowOrColumn = 3;
+
     public FieldStateManager(int columnsNumber, int rowsNumber, float cubeSize)
     {
         this.rowsMaxNumber = rowsNumber;
         this.columnsNumber = columnsNumber;
-        fieldState = new List<GameObject>[columnsNumber];
-        for (int i = 0; i < columnsNumber; i++)
-        {
-            fieldState[i] = new List<GameObject>();
-        }
+		allCubesOnField = new List<GameObject>();
+        
         this.cubeSize = cubeSize;
-        //Debug.Log("Field manager created: columnsNumber = " + columnsNumber + "; rowsnumber = " + rowsNumber);
 
 		scoreScript = GameObject.FindGameObjectWithTag("Score").GetComponent<ScoreScalable>();
     }
 
     public bool addCube(GameObject cube)
     {
-        int columnIndex = (int)((cube.transform.position.x + (float)Screen.width / 4) / (cubeSize / 2f));
-        int rowIndex = fieldState[columnIndex].Count;
-        //Debug.Log("Cube added into field manager. Column = " + (columnIndex) + ", Row = " + rowIndex);
+        //use for weight system
+		//int columnIndex = (int)((cube.transform.position.x + (float)Screen.width / 4) / (cubeSize / 2f));
+
+		int rowIndex = (int)((cube.transform.position.y) / (cubeSize / 2f));
+        Debug.Log("Cube added into field manager. Row = " + rowIndex);
         if (rowIndex < rowsMaxNumber)
         {
-            fieldState[columnIndex].Add(cube);
+            allCubesOnField.Add(cube);
             printState();
-            destroySameInRowAndColumn(cube.GetComponent<SpriteRenderer>().sprite, rowIndex, columnIndex);
+			destroySameInRowAndColumn((OneElementManager) cube.GetComponentInChildren(typeof(OneElementManager)));
 
             return true;
         }
@@ -53,104 +51,91 @@ public class FieldStateManager
 
     private void printState()
     {
-        for(int column=0;column<fieldState.Length; column++){
-            Debug.Log("Column" + column + " size = " + fieldState[column].Count);     
-        }
+
+			//Debug.Log("cubes : " + allCubesOnField.ForEach);     
+        
         
     }
 
-    private void destroySameInRowAndColumn(Sprite baseSprite, int baseRowIndex, int baseColumnIndex)
+	private void destroySameInRowAndColumn(OneElementManager baseCube)
     {
-        int minColumnIndexWithSameSprite = baseColumnIndex;
-        int maxColumnIndexWithSameSprite = baseColumnIndex;
-        int minRowIndexWithSameSprite = baseRowIndex;
+        List<OneElementManager> neigborsH = new List<OneElementManager>();
+		List<OneElementManager> neigborsV = new List<OneElementManager>();
+
+		//TODO fix this ugly code. what getObject* methods should return? Is there any othere object can be touched except OneElement? 
+		//check horizontaly to left
+		OneElementManager temp = convertToOneElement(baseCube.getObjectTouchedLeft());
+		while(temp!=null){
+			addIntoListIfSameTextures(baseCube, temp, neigborsH);
+			temp = convertToOneElement(temp.getObjectTouchedLeft());
+		}
+		//check horizontaly to right
+		temp = convertToOneElement(baseCube.getObjectTouchedRight());
+		while(temp!=null){
+			addIntoListIfSameTextures(baseCube, temp, neigborsH);
+			temp = convertToOneElement(temp.getObjectTouchedRight());
+		}
+		//check verticaly down
+		temp = convertToOneElement(baseCube.getObjectTouchedBottom());
+		while(temp!=null){
+			addIntoListIfSameTextures(baseCube, temp, neigborsV);
+			temp = convertToOneElement(temp.getObjectTouchedBottom());
+		}
+		//check verticaly up - for old cube after world will moved on
+		temp = convertToOneElement(baseCube.getObjectTouchedTop());
+		while(temp!=null){
+			addIntoListIfSameTextures(baseCube, temp, neigborsV);
+			temp = convertToOneElement(temp.getObjectTouchedTop());
+		}
+
+
+
 		int numberOfCubesDestroyed = 0;
-        //look for left cube in sequence of same cubes
-        for (int i = baseColumnIndex - 1; i >= 0; i--)
-        {
-			if (fieldState[i].Count > baseRowIndex && fieldState[i][baseRowIndex] != null)
-            {
-				if (fieldState[i][baseRowIndex].GetComponent<SpriteRenderer>().sprite == baseSprite)
-                {
-                    minColumnIndexWithSameSprite = i;
-                }
-				else
-				{
-					break;
-				}
-                
-            }
-			else
-			{
-				break;
-			}
-        }
-        //look for right cube in sequence
-        for (int i = baseColumnIndex + 1; i < columnsNumber; i++)
-        {
-			if (fieldState[i].Count > baseRowIndex && fieldState[i][baseRowIndex] != null)
-            {
-				if (fieldState[i][baseRowIndex].GetComponent<SpriteRenderer>().sprite == baseSprite)
-                {
-                    maxColumnIndexWithSameSprite = i;
-				}
-				else
-				{
-					break;
-				}
-                
-            }
-			else
-			{
-				break;
-			}
-        }
-        //look for lowest cube in sequence
-        for (int i = baseRowIndex - 1; i >= 0; i--)
-        {
-            if (fieldState[baseColumnIndex][i].GetComponent<SpriteRenderer>().sprite == baseSprite)
-            {
-                minRowIndexWithSameSprite = i;
-            }
-            else
-            {
-                break;
-            }
+        
+        //Debug.Log("Same cubes in row No " + baseRowIndex + " between " + minColumnIndexWithSameSprite + " and " + maxColumnIndexWithSameSprite + " columns");
+        //Debug.Log("Same cubes in column No " + baseColumnIndex + " between " + minRowIndexWithSameSprite + " and " + baseRowIndex + " rows");
 
-        }
-
-        Debug.Log("Same cubes in row No " + baseRowIndex + " between " + minColumnIndexWithSameSprite + " and " + maxColumnIndexWithSameSprite + " columns");
-        Debug.Log("Same cubes in column No " + baseColumnIndex + " between " + minRowIndexWithSameSprite + " and " + baseRowIndex + " rows");
-
-        if (maxColumnIndexWithSameSprite - minColumnIndexWithSameSprite >= 2)
+		if (neigborsH.Count >= minNumberInRowOrColumn-1)
         {
             //delete cube in row - including base one
-            for (int i = minColumnIndexWithSameSprite; i <= maxColumnIndexWithSameSprite; i++)
-            {
-                Debug.Log("Destroy object in row No " + baseRowIndex + " and column No " + i);
-                UObject.Destroy(fieldState[i][baseRowIndex]);
-				fieldState[i].RemoveAt(baseRowIndex);
+            foreach(OneElementManager oneElement in neigborsH){
+				UObject.Destroy(oneElement.gameObject);
 				numberOfCubesDestroyed++;
-            }
+			}
+			UObject.Destroy(baseCube.gameObject);
         }
 
-        if (baseRowIndex - minRowIndexWithSameSprite >= 2)
+		if (neigborsV.Count >= minNumberInRowOrColumn-1)
 
         {
-			int numberOfDeleted = 0;
+			Debug.Log(neigborsV.Count + " cubes in vertical line about to delete");
             //delete cube in column. Chack if base one still exist  
-            for (int i = minRowIndexWithSameSprite; i <= System.Math.Min(baseRowIndex, fieldState[baseColumnIndex].Count-1); i++)
-            {
-                Debug.Log("Destroy object in row No " + baseRowIndex + " and column No " + i);
-                UObject.Destroy(fieldState[baseColumnIndex][i]);
-				numberOfDeleted++;
+			if(numberOfCubesDestroyed==0){
+				UObject.Destroy(baseCube.gameObject);
+			}
+			foreach(OneElementManager oneElement in neigborsV){
+				UObject.Destroy(oneElement.gameObject);
 				numberOfCubesDestroyed++;
-            }
-			fieldState[baseColumnIndex].RemoveRange(minRowIndexWithSameSprite, numberOfDeleted); 
+			}
         }
 
 		scoreScript.updateScore(numberOfCubesDestroyed);
 
 
     }
+
+	private void addIntoListIfSameTextures (OneElementManager baseCube, OneElementManager temp, List<OneElementManager> neigborsList)
+	{
+		if(baseCube.GetComponent<SpriteRenderer>().sprite.Equals(temp.GetComponent<SpriteRenderer>().sprite)){
+			neigborsList.Add(temp);
+		}
+	}
+
+	private OneElementManager convertToOneElement(RaycastHit2D hit){
+		if(hit && hit.collider.gameObject.GetComponentInChildren(typeof(OneElementManager))!=null){
+			return (OneElementManager) hit.collider.gameObject.GetComponentInChildren(typeof(OneElementManager));
+		}else{
+			return null;
+		}
+	}
 }

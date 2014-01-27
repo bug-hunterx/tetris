@@ -7,8 +7,8 @@ public class CubesGenerator : MonoBehaviour {
 	//public Camera camera;
 	public GameObject cubePrefab;
 	public Sprite[] availableSprites;
-	private bool isGenerate = true;// false after cube is generated. true again aftyer cube fall down
-	private bool isGameOver = false;
+	public bool isGenerate = true;// false after cube is generated. true again aftyer cube fall down
+	public bool isGameOver = false;
 	private int columnNumber = 5;
 
 	private float cubeSize;

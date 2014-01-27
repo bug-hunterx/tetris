@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
+using AssemblyCSharp;
+using System;
 
 public class TouchControll : MonoBehaviour
 {
 
-		Transform objectTransform = null;
-		float offsetX;
+		ITouchableObject catchedTouchableObject;
 		private float radius = 0.1f;
-		Vector2 mousePositionInLastFrame;
+		Vector2 touchPositionInLastFrame;
 		public LayerMask touchableObjects;
 
 		// Use this for initialization
@@ -20,41 +21,41 @@ public class TouchControll : MonoBehaviour
 		void Update ()
 		{
 
-				// If we click the mouse - find clicked object
-				if (Input.GetMouseButtonDown (0)) { 
-						Debug.Log ("Mouse button down");
+			// If we click the mouse - find clicked object
+			if (Input.GetMouseButtonDown (0)) { 
+					//Debug.Log ("Mouse button down");
 
-						Vector2 touchPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-						Debug.Log ("Mouse down. Position =  " + touchPosition);
-						Collider2D[] colliders = Physics2D.OverlapCircleAll (touchPosition, radius, touchableObjects);
+					Vector2 touchPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+					//Debug.Log ("Mouse down. Position =  " + touchPosition);
+					Collider2D[] colliders = Physics2D.OverlapCircleAll (touchPosition, radius, touchableObjects);
 
-						Debug.Log ("Hit " + colliders.Length + " objects");
+					//Debug.Log ("Hit " + colliders.Length + " objects");
 
-						if (colliders.Length > 0) {    
-								// If we hit several objects process only first one
-								objectTransform = colliders [0].transform;   
-								mousePositionInLastFrame = touchPosition;
+					if (colliders.Length > 0) {    
+						// If we hit several objects process only first one
+						
+						catchedTouchableObject = (ITouchableObject) colliders[0].gameObject.GetComponentInChildren(typeof(ITouchableObject));
+						touchPositionInLastFrame = touchPosition;
+						
+						//Debug.Log ("Object catched = " + catchedTouchableObject);
+						//Debug.Log ("mouse position = " + touchPositionInLastFrame);
+                		
+                
 
-								Debug.Log ("Object position = " + objectTransform.position);
-								Debug.Log ("mouse position = " + mousePositionInLastFrame);
+					}
+		
+			} else if (Input.GetMouseButton (0) && catchedTouchableObject != null) {
+					//Debug.Log ("Mouse pressed");
+					//move object on X axis
+					Vector2 touchPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+			catchedTouchableObject.handleDrag(touchPosition - touchPositionInLastFrame);
+					touchPositionInLastFrame = touchPosition;
 
-						}
-			
-				} else if (Input.GetMouseButton (0) && objectTransform != null) {
-						Debug.Log ("Mouse pressed");
-						//move object on X axis
-						Vector2 touchPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-						offsetX = mousePositionInLastFrame.x - touchPosition.x;
-			//TODO send offsetX value to oneElementManager and let him check for borders and everything
-						Debug.Log ("OffsetX = " + offsetX);
-						objectTransform.position = new Vector3 (objectTransform.position.x - offsetX, objectTransform.position.y, objectTransform.position.z);
-						mousePositionInLastFrame = touchPosition;
-
-				} else if (Input.GetMouseButtonUp (0)) {
-						Debug.Log ("Mouse up");
-						objectTransform = null;     // Let go of the object.
-			
-				}
+			} else if (Input.GetMouseButtonUp (0)) {
+					//Debug.Log ("Mouse up");
+					catchedTouchableObject = null;     
+		
+			}
 
 			
 		}
