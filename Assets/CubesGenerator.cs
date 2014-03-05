@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+//this is not right!!!!! 
 public class CubesGenerator : MonoBehaviour {
 
 	private int screenWidth;
