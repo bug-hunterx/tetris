@@ -5,9 +5,8 @@ public class CubesGenerator : MonoBehaviour {
 
 	private int screenWidth;
 	//public Camera camera;
-	public GameObject cubePrefab;
-	public Sprite[] availableSprites;
-	public bool isGenerate = true;// false after cube is generated. true again aftyer cube fall down
+	public GameObject[] cubePrefabs;
+	public bool isGenerate = true;// false after cube is generated. true again after cube have fall down
 	public bool isGameOver = false;
 	private int columnNumber = 5;
 
@@ -49,11 +48,10 @@ public class CubesGenerator : MonoBehaviour {
 
 	private GameObject generateNewCube(){
 
-		GameObject currentCube = Instantiate(cubePrefab, transform.position, transform.rotation) as GameObject;
 
-		//set random sprite
-		int spriteIndex = Random.Range(0, availableSprites.Length);
-		currentCube.GetComponent<SpriteRenderer>().sprite = availableSprites[spriteIndex];
+		//get random prefab
+		int prefabIndex = Random.Range(0, cubePrefabs.Length);
+		GameObject currentCube = Instantiate(cubePrefabs[prefabIndex], transform.position, transform.rotation) as GameObject;
 
 		currentCube.GetComponent<Transform>().localScale = new Vector3(cubeSize, cubeSize, 0.1f);
 

@@ -10,6 +10,7 @@ public class OneElementManager : MonoBehaviour, ITouchableObject{
 	public int uniqueID;
 
 	private bool falling = true;
+	private bool touchCollider = false;
 	private Rigidbody2D myRigidBody;
 
 	private float size;
@@ -27,12 +28,18 @@ public class OneElementManager : MonoBehaviour, ITouchableObject{
 
 	//const vertical velocity
 	private Vector2 vertVelocity;
+	private float horVelocity;
 
 	//touch or mouse input delta for last frame
 	public float touchDistance;
 
+	Animator animator;
+	private String horVelocityProperty = "HorVelocity";
+	private String verVelocityProperty = "VerVelocity";
+
 	// Use this for initialization
 	void Start () {
+		animator = GetComponent<Animator>();
 		myRigidBody = GetComponent<Rigidbody2D>();
 		size = transform.localScale.x;
 
@@ -55,6 +62,17 @@ public class OneElementManager : MonoBehaviour, ITouchableObject{
 
 	}
 
+	void OnCollisionEnter2D(Collision2D collision){
+		Debug.Log ("Touch some collider " + collision);
+
+		touchCollider = Tools.IsInLayerMask(collision.gameObject, obstacles);
+	}
+
+	void OnCollisionExit2D(Collision2D collision){
+		Debug.Log ("Stop touch collider");
+		touchCollider = !Tools.IsInLayerMask(collision.gameObject, obstacles);
+	}
+
 	private void moveIfNecessary(){
 		stopOrStartCubeIfNecessary();
 		if(falling){
@@ -62,9 +80,12 @@ public class OneElementManager : MonoBehaviour, ITouchableObject{
 
 			moveByMouseOrTouch();
 
+		}else{
+			updateAnimation(0);
 		}
 	}
 
+	//TODO fix for testing on computer or delete??? 
 	void moveByKeyboard ()
 	{
 		//Vector3 position = transform.position;
@@ -91,14 +112,24 @@ public class OneElementManager : MonoBehaviour, ITouchableObject{
 
 	void moveByMouseOrTouch ()
 	{
+		updateAnimation(touchDistance);
 		if(touchDistance!=0){
-
+			//Debug.Log ("Touch distance = " + touchDistance);
 			float newXCoordinate = getNewCoordinateRegardingObstacles(touchDistance);
 			transform.position = new Vector3 (newXCoordinate, transform.position.y, transform.position.z);
+
 			touchDistance=0;
 		}
 
 	}
+
+	void updateAnimation (float touchDistance)
+	{
+		//hor velocity = touchDistance - precice value is not important anyway.
+
+		horVelocity = touchDistance;
+		animator.SetFloat(horVelocityProperty, horVelocity);
+    }
 
 	//calculate real distance on which cube can be moved. cubes can't overlap each other.
 	private float getNewCoordinateRegardingObstacles (float touchDistance)
@@ -126,12 +157,12 @@ public class OneElementManager : MonoBehaviour, ITouchableObject{
 	}
 
 	private void stopOrStartCubeIfNecessary(){
-		if(isStayOnGroundOrOtherCube()){
+		if(touchCollider){
 			falling = false;
 			myRigidBody.velocity = new Vector2(0,0);
 			gameObject.layer = LayerMask.NameToLayer ("PlacedCubes");
 			//as cube stops it became kinematic
-			myRigidBody.isKinematic = true;
+			//myRigidBody.isKinematic = true;
 		}else{
 			falling = true;
 			myRigidBody.isKinematic = false;
@@ -168,21 +199,25 @@ public class OneElementManager : MonoBehaviour, ITouchableObject{
 		float currentY = transform.position.y;
 		float z =0;
 		RaycastHit2D hitLeftCorner = Physics2D.Linecast(
-			new Vector3(currentX - size/4f + delta, currentY - size/4f, z), 
-			new Vector3(currentX - size/4f + delta, currentY - size/4f - delta, z), 
-			obstacles );
-		if(hitLeftCorner){
-			return hitLeftCorner;
-		}
-		RaycastHit2D hitRightCorner = Physics2D.Linecast(
-			new Vector3(currentX + size/4f - delta, currentY - size/4f, z), 
-			new Vector3(currentX + size/4f - delta, currentY - size/4f - delta, z), 
-			obstacles );
-		if(hitRightCorner){
-			return hitRightCorner;
-		}
+			new Vector3(currentX, currentY - size/4f, z), 
+			new Vector3(currentX, currentY - size/4f - delta, z), 
+			obstacles );		
+//		RaycastHit2D hitLeftCorner = Physics2D.Linecast(
+//			new Vector3(currentX - size/4f + delta, currentY - size/4f, z), 
+//			new Vector3(currentX - size/4f + delta, currentY - size/4f - delta, z), 
+//			obstacles );
+//		if(hitLeftCorner){
+//			return hitLeftCorner;
+//		}
+//		RaycastHit2D hitRightCorner = Physics2D.Linecast(
+//			new Vector3(currentX + size/4f - delta, currentY - size/4f, z), 
+//			new Vector3(currentX + size/4f - delta, currentY - size/4f - delta, z), 
+//			obstacles );
+//		if(hitRightCorner){
+//			return hitRightCorner;
+//		}
 		//return null wraped into 
-		return hitRightCorner;
+		return hitLeftCorner;
 	}
 
 	public RaycastHit2D getObjectTouchedTop(){
